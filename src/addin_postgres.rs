@@ -9,15 +9,13 @@ use std::{
     time::Duration,
 };
 
-use addin1c::{name, AddinError, MethodInfo, Methods, ParamValue, PropInfo, SimpleAddin, Variant};
+use addin1c::{name, AddinResult, MethodInfo, Methods, ParamValue, PropInfo, SimpleAddin, Variant};
 use postgres::{fallible_iterator::FallibleIterator, notifications, Client, NoTls};
 use serde::Serialize;
 use smallvec::SmallVec;
 use utf16_lit::utf16;
 
 use crate::serializer::{self, serialize_simple};
-
-type AddinResult = Result<(), Box<dyn std::error::Error>>;
 
 pub struct Addin {
     client: Option<Client>,
@@ -32,7 +30,7 @@ impl Addin {
         }
     }
 
-    fn last_error(&mut self, value: &mut Variant) -> AddinError {
+    fn last_error(&mut self, value: &mut Variant) -> AddinResult {
         match &self.last_error {
             Some(err) => value
                 .set_str1c(err.to_string().as_str())
